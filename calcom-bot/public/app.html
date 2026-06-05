@@ -23,11 +23,13 @@
       --radius: 18px;
       --radius-sm: 14px;
       --easeOut: cubic-bezier(.2,.8,.2,1);
-      --space-xs: 6px;
-      --space-sm: 10px;
-      --space-md: 14px;
-      --space-lg: 18px;
+      --space-xs: 8px;
+      --space-sm: 12px;
+      --space-md: 20px;
+      --space-lg: 28px;
+      --space-xl: 36px;
       --touch: 44px;
+      --content-max: 1280px;
     }
     *{ box-sizing: border-box; }
     body{
@@ -44,7 +46,19 @@
     }
     a{ color: inherit; }
 
-    .shell{ max-width: 1280px; margin: 0 auto; padding: 12px; padding-left: max(12px, env(safe-area-inset-left)); padding-right: max(12px, env(safe-area-inset-right)); }
+    .shell{
+      max-width: var(--content-max);
+      margin: 0 auto;
+      padding: var(--space-md);
+      padding-left: max(var(--space-md), env(safe-area-inset-left));
+      padding-right: max(var(--space-md), env(safe-area-inset-right));
+    }
+    .page{
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-lg);
+      margin-top: var(--space-lg);
+    }
     .appear{ animation: appear .35s var(--easeOut) both; }
     @keyframes appear{ from{ opacity:0; transform: translateY(10px); filter: blur(6px);} to{ opacity:1; transform: translateY(0); filter: blur(0);} }
     .topbar{
@@ -54,16 +68,16 @@
         "brand actions"
         "tabs tabs";
       align-items: center;
-      gap: var(--space-sm);
-      padding: 12px;
+      gap: var(--space-md);
+      padding: var(--space-md);
       border:1px solid var(--stroke);
       border-radius: var(--radius);
       background: rgba(255,255,255,.05);
       backdrop-filter: blur(14px);
       box-shadow: 0 10px 35px rgba(0,0,0,.35);
-      position: sticky; top: 8px; z-index: 20;
+      position: sticky; top: var(--space-sm); z-index: 20;
     }
-    .brand{ grid-area: brand; display:flex; align-items:center; gap:12px; min-width: 0; }
+    .brand{ grid-area: brand; display:flex; align-items:center; gap: var(--space-sm); min-width: 0; }
     .logo{
       width: 34px; height: 34px; border-radius: 12px;
       background: #fff;
@@ -77,9 +91,10 @@
     .brand .sub{ font-size: .78rem; color: var(--muted); margin-top:2px; line-height: 1.3; }
     .tabs{
       grid-area: tabs;
-      display:flex; gap:6px;
+      display:flex; gap: var(--space-xs);
       overflow-x: auto; -webkit-overflow-scrolling: touch;
-      scrollbar-width: none; padding-bottom: 2px;
+      scrollbar-width: none;
+      padding: var(--space-xs) 0;
       width: 100%;
     }
     .tabs::-webkit-scrollbar{ display:none; }
@@ -175,43 +190,85 @@
     .grid{
       display:grid;
       grid-template-columns: 1fr;
-      gap: var(--space-md);
-      margin-top: var(--space-md);
+      gap: var(--space-lg);
+      align-items: start;
     }
     .grid-instances{ grid-template-columns: 1fr; }
     .card{
       background: rgba(255,255,255,.05);
       border: 1px solid var(--stroke);
       border-radius: var(--radius);
-      padding: var(--space-md);
+      padding: var(--space-lg);
       box-shadow: var(--shadow);
       backdrop-filter: blur(14px);
       transform: translateZ(0);
       transition: .22s var(--easeOut);
     }
     .card-head{
-      display:flex; align-items:flex-start; justify-content:space-between;
-      gap: var(--space-sm); flex-wrap:wrap;
-      margin-bottom: var(--space-md);
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap: var(--space-md);
+      flex-wrap:wrap;
+      margin-bottom: var(--space-lg);
+      padding-bottom: var(--space-md);
+      border-bottom: 1px solid rgba(255,255,255,.08);
     }
-    .card-head h2{ margin:0; }
-    .card-head .desc{ margin:4px 0 0; flex: 1 1 100%; }
-    .card-head-actions{ display:flex; gap:8px; flex-wrap:wrap; flex-shrink:0; }
+    .card-head > div:first-child{ flex: 1 1 220px; min-width: 0; }
+    .card-head h2{ margin:0 0 var(--space-xs); }
+    .card-head .desc{ margin:0; flex: none; }
+    .card-head-actions{
+      display:flex;
+      gap: var(--space-xs);
+      flex-wrap:wrap;
+      flex-shrink:0;
+      align-items:center;
+      align-self: flex-start;
+    }
     .card-span{ grid-column: 1 / -1; }
     @media (hover: hover){
       .card:hover{ border-color: rgba(255,255,255,.16); transform: translateY(-1px); }
     }
-    .card h2{ margin:0 0 var(--space-sm); font-size: .95rem; color: rgba(255,255,255,.88); letter-spacing:.01em; }
-    .desc{ color: var(--muted); font-size: .86rem; margin: 0 0 var(--space-md); line-height: 1.45; }
+    .card h2{
+      margin:0 0 var(--space-sm);
+      font-size: 1rem;
+      color: rgba(255,255,255,.92);
+      letter-spacing:.01em;
+      display:flex;
+      align-items:center;
+      gap: var(--space-sm);
+      line-height: 1.3;
+    }
+    .step-num{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      width: 26px; height: 26px;
+      border-radius: 8px;
+      font-size: .78rem;
+      font-weight: 800;
+      color: #fff;
+      background: linear-gradient(135deg, rgba(255,77,77,1), rgba(255,77,77,.7));
+      flex-shrink: 0;
+    }
+    .desc{
+      color: var(--muted);
+      font-size: .88rem;
+      margin: 0 0 var(--space-md);
+      line-height: 1.55;
+      max-width: 62ch;
+    }
+    .card > .desc:last-of-type{ margin-bottom: var(--space-md); }
     textarea, input, select.select{
       width:100%;
       background: rgba(0,0,0,.22);
       border: 1px solid rgba(255,255,255,.10);
       color: var(--text);
       border-radius: var(--radius-sm);
-      padding: 12px 12px;
+      padding: 13px 14px;
       outline: none;
       transition: .18s var(--easeOut);
+      line-height: 1.4;
     }
     select.select{ cursor:pointer; appearance:none; background-image: linear-gradient(45deg, transparent 50%, rgba(255,255,255,.45) 50%), linear-gradient(135deg, rgba(255,255,255,.45) 50%, transparent 50%); background-position: calc(100% - 18px) calc(50% + 2px), calc(100% - 13px) calc(50% + 2px); background-size: 5px 5px, 5px 5px; background-repeat: no-repeat; padding-right: 34px; }
     textarea{ min-height: 200px; resize: vertical; font-size: 16px; line-height: 1.45; }
@@ -219,11 +276,29 @@
     textarea:focus, input:focus, select.select:focus{ border-color: rgba(255,255,255,.22); background-color: rgba(0,0,0,.28); box-shadow: 0 0 0 3px rgba(255,77,77,.12); }
 
     .field{ display:flex; flex-direction:column; gap: var(--space-xs); }
-    .field-label{ font-size: .74rem; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: rgba(255,255,255,.52); }
-    .field-row{ display:flex; flex-wrap:wrap; gap: 8px; align-items: stretch; }
+    .field-label{
+      font-size: .72rem;
+      font-weight: 700;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.55);
+      padding-left: 2px;
+    }
+    .field-row{
+      display:flex;
+      flex-wrap:wrap;
+      gap: var(--space-sm);
+      align-items: stretch;
+    }
     .field-row > input,
-    .field-row > select.select{ flex: 1 1 140px; min-width: 0; width: auto; }
+    .field-row > select.select{ flex: 1 1 160px; min-width: 0; width: auto; }
     .field-row > .btn{ flex: 0 0 auto; width: auto; min-width: var(--touch); }
+
+    .form-grid{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap: var(--space-md);
+    }
 
     .sections{ display:flex; flex-direction:column; gap: var(--space-md); }
     .section{
@@ -232,12 +307,29 @@
       border: 1px solid rgba(255,255,255,.08);
       background: rgba(0,0,0,.16);
     }
-    .section-title{ margin:0 0 4px; font-size: .84rem; font-weight: 800; color: rgba(255,255,255,.88); }
-    .section-desc{ margin:0 0 var(--space-sm); font-size: .8rem; color: var(--muted); line-height: 1.4; }
+    .section-title{
+      margin:0 0 var(--space-xs);
+      font-size: .86rem;
+      font-weight: 800;
+      color: rgba(255,255,255,.9);
+      letter-spacing: .02em;
+    }
+    .section-desc{
+      margin:0 0 var(--space-md);
+      font-size: .82rem;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+    .section .field-row,
+    .section .btn-bar{ margin-top: 0; }
+    .section .field-row + .btn-bar{ margin-top: var(--space-sm); }
 
     .btn-bar{
-      display:flex; flex-wrap:wrap; gap: 8px; align-items:stretch;
-      margin-top: var(--space-sm);
+      display:flex;
+      flex-wrap:wrap;
+      gap: var(--space-sm);
+      align-items:stretch;
+      margin-top: var(--space-md);
     }
     .btn-bar .btn{ flex: 1 1 calc(50% - 4px); min-width: 0; }
     .btn-bar.end{ justify-content:flex-end; }
@@ -252,26 +344,57 @@
     .btn-grid.cols-4{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
 
     .toolbar{
-      display:flex; flex-direction:column; gap: 8px;
-      padding: var(--space-sm);
+      display:flex;
+      flex-direction:column;
+      gap: var(--space-sm);
+      padding: var(--space-md);
       border-radius: var(--radius-sm);
-      border: 1px solid rgba(255,255,255,.07);
+      border: 1px solid rgba(255,255,255,.08);
       background: rgba(0,0,0,.14);
       margin-bottom: var(--space-md);
     }
-    .toolbar-row{ display:flex; flex-wrap:wrap; gap: 8px; align-items: stretch; }
-    .toolbar-row > input{ flex: 1 1 180px; min-width: 0; width: auto; }
-    .toolbar-row > select.select{ flex: 0 1 170px; min-width: 0; width: auto; }
+    .toolbar-row{
+      display:flex;
+      flex-wrap:wrap;
+      gap: var(--space-sm);
+      align-items: stretch;
+    }
+    .toolbar-row > input{ flex: 1 1 220px; min-width: 0; width: auto; }
+    .toolbar-row > select.select{ flex: 0 1 180px; min-width: 0; width: auto; }
     .toolbar-row > .btn{ flex: 0 0 auto; width: auto; }
+    .toolbar-meta{
+      font-size: .84rem;
+      color: var(--muted);
+      padding: 0 2px;
+      margin-bottom: var(--space-sm);
+    }
+
+    .data-panel{
+      white-space: normal;
+      overflow: auto;
+      max-height: min(52vh, 520px);
+      padding: var(--space-xs);
+      margin-top: var(--space-sm);
+      border-radius: var(--radius-sm);
+      border: 1px solid rgba(255,255,255,.08);
+      background: rgba(0,0,0,.18);
+    }
+    .data-panel .instCard{ margin-bottom: var(--space-sm); }
+    .data-panel .instCard:last-child{ margin-bottom: 0; }
 
     .panel-nested{
-      margin-top: var(--space-md);
+      margin-top: var(--space-lg);
       padding: var(--space-md);
       border-radius: var(--radius-sm);
       border: 1px dashed rgba(255,255,255,.12);
       background: rgba(0,0,0,.12);
     }
-    .panel-nested h2{ margin-top:0; font-size: .9rem; }
+    .panel-nested h2{
+      margin: 0 0 var(--space-md);
+      font-size: .92rem;
+      padding-bottom: var(--space-sm);
+      border-bottom: 1px solid rgba(255,255,255,.07);
+    }
 
     .row{ display:flex; flex-direction:column; gap:10px; align-items:stretch; }
     .row > *{ width: 100%; }
@@ -288,12 +411,19 @@
     }
 
     .chat{
-      display:flex; flex-direction:column; gap:10px;
-      max-height: min(42vh, 330px); overflow:auto;
-      padding-right: 2px;
+      display:flex;
+      flex-direction:column;
+      gap: var(--space-sm);
+      max-height: min(42vh, 340px);
+      overflow:auto;
+      padding: var(--space-xs);
+      margin-bottom: var(--space-md);
+      border-radius: var(--radius-sm);
+      border: 1px solid rgba(255,255,255,.07);
+      background: rgba(0,0,0,.12);
       -webkit-overflow-scrolling: touch;
     }
-    .msg{ padding: 10px 12px; border-radius: 14px; border:1px solid rgba(255,255,255,.08); }
+    .msg{ padding: 12px 14px; border-radius: 14px; border:1px solid rgba(255,255,255,.08); line-height: 1.45; }
     .msg.ai{ background: rgba(52,199,89,.10); }
     .msg.user{ background: rgba(0,122,255,.12); }
     .msg.system{ background: rgba(255,204,0,.10); border-color: rgba(255,204,0,.18); color: rgba(255,255,255,.9); }
@@ -304,13 +434,19 @@
       background: rgba(0,0,0,.22);
       border: 1px solid rgba(255,255,255,.10);
       border-radius: 14px;
-      padding: 12px;
+      padding: var(--space-md);
       font-size: .86rem;
+      line-height: 1.5;
       min-height: 130px;
     }
 
     /* Instances */
-    .instList{ display:flex; flex-direction:column; gap: var(--space-sm); }
+    .instList{
+      display:flex;
+      flex-direction:column;
+      gap: var(--space-sm);
+      min-height: 80px;
+    }
     .instCard{
       border-radius: var(--radius-sm);
       border: 1px solid rgba(255,255,255,.10);
@@ -318,17 +454,57 @@
       padding: var(--space-md);
       display:grid;
       grid-template-columns: 1fr;
-      gap: var(--space-sm);
+      gap: var(--space-md);
+      align-items: start;
       transition: .18s var(--easeOut);
     }
-    .instCard-main{ min-width: 0; }
-    .instCard-meta{ display:flex; flex-wrap:wrap; align-items:center; gap: 8px; margin-top: 6px; }
-    .instCard-meta .evo{ color: var(--muted); font-size: .78rem; word-break: break-all; }
-    .instCard-actions{ display:grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+    .instCard-main{ min-width: 0; display:flex; flex-direction:column; gap: var(--space-xs); }
+    .instCard-meta{
+      display:flex;
+      flex-wrap:wrap;
+      align-items:center;
+      gap: var(--space-sm);
+    }
+    .instCard-meta .evo{
+      color: var(--muted);
+      font-size: .8rem;
+      word-break: break-all;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    }
+    .instCard-actions{
+      display:grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: var(--space-sm);
+    }
+    .instCard-actions .btn{ justify-content: center; }
+    .instTitle{ font-weight:800; letter-spacing:.2px; font-size: .94rem; line-height: 1.35; }
     @media (hover: hover){
       .instCard:hover{ transform: translateY(-1px); border-color: rgba(255,255,255,.16); background: rgba(0,0,0,.26); }
     }
-    .instTitle{ font-weight:800; letter-spacing:.2px; font-size: .92rem; line-height: 1.25; }
+    .mono{
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: .82em;
+      word-break: break-all;
+    }
+    .tag-inline{
+      display:inline-flex;
+      align-items:center;
+      gap: var(--space-sm);
+      flex-wrap:wrap;
+      margin-top: var(--space-xs);
+    }
+    .tag-inline .pill + span{ color: var(--muted); font-size: .84rem; }
+
+    .card-title-tag{
+      font-family: ui-monospace, monospace;
+      font-size: .78em;
+      opacity: .65;
+      font-weight: 600;
+    }
+
+    .wh-row select.select{ flex: 0 0 168px; min-width: 140px; }
+    .wh-row input{ flex: 1 1 220px; }
+    .sb-order{ flex: 0 0 112px; max-width: 120px; }
     .pill{
       display:inline-flex; align-items:center; gap:6px;
       border-radius: 999px; padding: 6px 10px;
@@ -419,40 +595,57 @@
 
     /* Desktop — escala a partir do mobile */
     @media (min-width: 768px){
-      .shell{ padding: 22px; }
+      .shell{ padding: var(--space-lg) var(--space-xl); }
+      .page{ margin-top: var(--space-xl); gap: var(--space-xl); }
       .topbar{
         display:flex; flex-direction: row; align-items: center; justify-content: space-between;
-        padding: 14px 16px; border-radius: 999px; top: 14px;
+        gap: var(--space-lg);
+        padding: var(--space-md) var(--space-lg);
+        border-radius: 999px;
+        top: var(--space-md);
         grid-template-columns: none; grid-template-areas: none;
       }
       .brand{ grid-area: auto; flex: 0 0 auto; }
-      .tabs{ grid-area: auto; flex: 1; justify-content: center; overflow: visible; max-width: 520px; margin: 0 auto; }
-      .right{ grid-area: auto; width: auto; flex-wrap: nowrap; }
+      .tabs{ grid-area: auto; flex: 1; justify-content: center; overflow: visible; max-width: 540px; margin: 0 auto; }
+      .right{ grid-area: auto; width: auto; flex-wrap: nowrap; gap: var(--space-sm); }
       .right .chip{ display:flex; }
-      .tab{ padding: 10px 14px; font-size: inherit; }
+      .tab{ padding: 10px 16px; font-size: inherit; }
       .tab-label{ display: inline; }
       .chip span:last-child{ max-width: 220px; }
-      .grid{ grid-template-columns: 1.15fr .85fr; gap: var(--space-lg); margin-top: var(--space-lg); }
-      .grid-instances{ grid-template-columns: minmax(300px, 1fr) minmax(360px, 1.05fr); }
-      .card{ padding: var(--space-lg); }
+      .grid{ grid-template-columns: 1.12fr .88fr; gap: var(--space-xl); }
+      .grid-instances{ grid-template-columns: minmax(320px, 1fr) minmax(380px, 1.08fr); }
+      .form-grid{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .form-grid .field-span-2{ grid-column: 1 / -1; }
+      .card{ padding: var(--space-xl); }
       .card:hover{ border-color: rgba(255,255,255,.16); transform: translateY(-1px); }
-      textarea{ min-height: 260px; }
+      textarea{ min-height: 280px; }
       .row{ flex-direction: row; flex-wrap: wrap; align-items: center; }
       .row > *{ width: auto; flex: 1 1 auto; }
       .row .btn{ width: auto; flex: 0 0 auto; }
       .btn-bar .btn{ flex: 0 0 auto; width: auto; min-width: var(--touch); }
       .btn-bar.stack .btn{ flex: 0 0 auto; width: auto; }
       .btn-grid.cols-4{ grid-template-columns: repeat(4, minmax(0, 1fr)); }
-      .instCard{ grid-template-columns: 1fr auto; align-items: center; gap: var(--space-md); }
-      .instCard-actions{ grid-template-columns: repeat(4, auto); display:flex; flex-wrap:wrap; justify-content:flex-end; }
-      .instCard-actions .btn{ min-width: 0; }
-      .toolbar{ flex-direction: row; flex-wrap: wrap; align-items: center; }
-      .toolbar-row{ flex: 1 1 auto; }
-      .toasts{ left: auto; right: 18px; bottom: 18px; width: 360px; }
-      .toast{ width: 360px; }
-      .modalBack{ align-items: center; padding: 18px; }
+      .instCard{ grid-template-columns: 1fr auto; align-items: center; gap: var(--space-lg); }
+      .instCard-actions{
+        display:flex;
+        flex-wrap:wrap;
+        justify-content:flex-end;
+        gap: var(--space-xs);
+        max-width: 420px;
+      }
+      .instCard-actions .btn{ min-width: 0; flex: 0 0 auto; }
+      .toolbar{
+        display:grid;
+        grid-template-columns: 1fr;
+        gap: var(--space-sm);
+      }
+      .toolbar-row{ width: 100%; }
+      .toasts{ left: auto; right: var(--space-lg); bottom: var(--space-lg); width: 380px; }
+      .toast{ width: 380px; }
+      .modalBack{ align-items: center; padding: var(--space-lg); }
       .modal{ width: min(860px, 100%); border-radius: 22px; max-height: none; }
-      .modalBody{ grid-template-columns: 1fr 1fr; }
+      .modalBody{ grid-template-columns: 1fr 1fr; gap: var(--space-lg); padding: var(--space-lg); }
+      .modalHeader, .modalFooter{ padding: var(--space-md) var(--space-lg); }
     }
     @media (min-width: 480px){
       .btn-grid.cols-4{ grid-template-columns: repeat(4, minmax(0, 1fr)); }
@@ -491,10 +684,10 @@
     </div>
 
     <!-- Intake -->
-    <div id="viewIntake">
+    <div id="viewIntake" class="page">
       <div class="grid">
         <div class="card">
-          <h2>1) Cole as informações da clínica</h2>
+          <h2><span class="step-num">1</span> Cole as informações da clínica</h2>
           <p class="desc">Cole o questionário completo. A IA vai extrair nome, horários, duração, fuso e endereço. Se algo estiver faltando, ela pergunta.</p>
           <textarea id="questionnaire" placeholder="Cole aqui o questionário completo..."></textarea>
           <div class="btn-bar">
@@ -504,17 +697,17 @@
         </div>
 
         <div class="card">
-          <h2>2) Chat com a IA</h2>
+          <h2><span class="step-num">2</span> Chat com a IA</h2>
           <p class="desc">Responda às perguntas para fechar a configuração. Ex.: “duração é 40 minutos”.</p>
           <div class="chat" id="chat" aria-live="polite"></div>
-          <div class="field-row" style="margin-top:10px;">
+          <div class="field-row">
             <input id="chatInput" placeholder="Digite sua resposta..." disabled />
             <button class="btn primary" id="btnSend" disabled><iconify-icon class="ico" icon="lucide:send" aria-hidden="true"></iconify-icon>Enviar</button>
           </div>
         </div>
 
         <div class="card card-span">
-          <h2>3) Revisão e criação</h2>
+          <h2><span class="step-num">3</span> Revisão e criação</h2>
           <p class="desc">Confira o resumo e clique em “Criar no Cal.com”. Vai abrir uma janela do Chrome para você resolver o captcha.</p>
           <div class="summary" id="summary">Aguardando análise...</div>
           <div class="btn-bar end">
@@ -525,7 +718,7 @@
     </div>
 
     <!-- Instances -->
-    <div id="viewInstances" class="hide">
+    <div id="viewInstances" class="page hide">
       <div class="grid grid-instances">
         <div class="card">
           <div class="card-head">
@@ -570,8 +763,8 @@
             <div class="section">
               <div class="section-title">Webhook</div>
               <p class="section-desc">Escuta somente mensagens. Ignora wasSentByApi e grupos.</p>
-              <div class="field-row">
-                <select id="whEnv" class="select" style="flex:0 0 auto; min-width: 160px;">
+              <div class="field-row wh-row">
+                <select id="whEnv" class="select">
                   <option value="test">Teste</option>
                   <option value="production">Produção</option>
                   <option value="custom">Personalizado</option>
@@ -608,10 +801,10 @@
     </div>
 
     <!-- Supabase -->
-    <div id="viewSupabase" class="hide">
+    <div id="viewSupabase" class="page hide">
       <div class="grid">
         <div class="card">
-          <h2>Perfis <span style="font-family: ui-monospace, monospace; font-size:.82em; opacity:.75;">profiles</span></h2>
+          <h2>Perfis <span class="card-title-tag">profiles</span></h2>
           <p class="desc">Pesquise, ordene e edite. Clique num perfil na lista para carregar à direita.</p>
 
           <div class="toolbar">
@@ -625,8 +818,8 @@
               <button class="btn sm" id="sbRefresh"><iconify-icon class="ico" icon="lucide:refresh-cw" aria-hidden="true"></iconify-icon>Atualizar</button>
             </div>
             <div class="toolbar-row">
-              <select id="sbSort" class="select" style="flex:1 1 220px;"></select>
-              <select id="sbOrder" class="select" style="flex:0 0 120px;">
+              <select id="sbSort" class="select"></select>
+              <select id="sbOrder" class="select sb-order">
                 <option value="desc">Desc</option>
                 <option value="asc">Asc</option>
               </select>
@@ -635,16 +828,16 @@
             </div>
           </div>
 
-          <div class="desc" id="sbInfo">—</div>
-          <div class="summary" id="sbTable" style="margin-top:10px; white-space: normal; overflow:auto; max-height: min(52vh, 520px);"></div>
+          <div class="toolbar-meta" id="sbInfo">—</div>
+          <div class="data-panel summary" id="sbTable"></div>
         </div>
 
         <div class="card">
           <h2>Edição rápida</h2>
           <p class="desc">Alterações são salvas direto no Supabase.</p>
 
-          <div class="sections">
-            <div class="field">
+          <div class="form-grid sections">
+            <div class="field field-span-2">
               <label class="field-label" for="sbEditId">ID do perfil</label>
               <input id="sbEditId" placeholder="Selecione um perfil na lista" disabled />
             </div>
@@ -681,7 +874,7 @@
     </div>
 
     <!-- Auth -->
-    <div id="viewAuth" class="hide">
+    <div id="viewAuth" class="page hide">
       <div class="grid">
         <div class="card">
           <h2>Usuários Auth</h2>
@@ -694,14 +887,14 @@
             </div>
           </div>
 
-          <div class="summary" id="authList" style="white-space: normal; overflow:auto; max-height: min(52vh, 520px);"></div>
+          <div class="data-panel summary" id="authList"></div>
         </div>
 
         <div class="card">
           <h2>Criar usuário</h2>
           <p class="desc">Cria o profile automaticamente e grava user_metadata.profile_id.</p>
 
-          <div class="sections">
+          <div class="form-grid sections">
             <div class="field">
               <label class="field-label" for="authNewEmail">E-mail</label>
               <input id="authNewEmail" placeholder="email@dominio.com" />
@@ -731,10 +924,10 @@
           <div class="panel-nested">
             <h2>Detalhes do usuário selecionado</h2>
             <div class="sections">
-              <div class="field">
-                <label class="field-label" for="authSelId">User ID</label>
-                <input id="authSelId" placeholder="Selecione na lista" disabled />
-              </div>
+            <div class="field field-span-2">
+              <label class="field-label" for="authSelId">User ID</label>
+              <input id="authSelId" placeholder="Selecione na lista" disabled />
+            </div>
               <div class="field">
                 <label class="field-label" for="authEditEmail">E-mail</label>
                 <input id="authEditEmail" placeholder="email@dominio.com" />
@@ -760,7 +953,7 @@
               <button class="btn" id="authActivate"><iconify-icon class="ico" icon="lucide:unlock" aria-hidden="true"></iconify-icon>Ativar</button>
               <button class="btn danger" id="authDeactivate"><iconify-icon class="ico" icon="lucide:lock" aria-hidden="true"></iconify-icon>Desativar</button>
             </div>
-            <div class="field-row" style="margin-top:8px;">
+            <div class="field-row">
               <input id="authLinkProfileId" placeholder="profile_id (uuid) para vincular" />
               <button class="btn" id="authLink"><iconify-icon class="ico" icon="lucide:link" aria-hidden="true"></iconify-icon>Vincular</button>
             </div>
@@ -1170,19 +1363,19 @@
         const card = document.createElement('div');
         card.className = 'instCard';
         const left = document.createElement('div');
+        left.className = 'instCard-main';
         left.innerHTML = `
           <div class="instTitle">${escapeHtml(r.clinic_name || r.name || r.id)}</div>
-          <div class="desc" style="margin:6px 0 0;">
+          <div class="tag-inline">
             <span class="pill neutral"><span class="dot"></span>${escapeHtml(r.evo || '—')}</span>
-            <span style="margin-left:8px;color:var(--muted);font-size:.82rem;">${escapeHtml(r.numero || '')}</span>
+            <span>${escapeHtml(r.numero || '')}</span>
           </div>
-          <div class="desc" style="margin:6px 0 0;">ID: <span style="font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, \"Liberation Mono\", \"Courier New\", monospace;">${escapeHtml(r.id)}</span></div>
+          <div class="desc" style="margin:0;">ID: <span class="mono">${escapeHtml(r.id)}</span></div>
         `;
         const actions = document.createElement('div');
-        actions.className = 'row';
-        actions.style.justifyContent = 'flex-end';
-        actions.style.gap = '8px';
-        actions.innerHTML = `<button class="btn">Editar</button>`;
+        actions.className = 'instCard-actions';
+        actions.style.gridTemplateColumns = '1fr';
+        actions.innerHTML = `<button class="btn sm">Editar</button>`;
         actions.querySelector('button').onclick = () => selectProfileForEdit(r);
         card.appendChild(left);
         card.appendChild(actions);
@@ -1305,14 +1498,14 @@
         const card = document.createElement('div');
         card.className = 'instCard';
         card.innerHTML = `
-          <div>
+          <div class="instCard-main">
             <div class="instTitle">${escapeHtml(title)}</div>
-            <div class="desc" style="margin:6px 0 0;">${pill} <span style="margin-left:8px;color:var(--muted);font-size:.82rem;">${escapeHtml(u.email || '')}</span></div>
-            <div class="desc" style="margin:6px 0 0;">ID: <span style="font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, \"Liberation Mono\", \"Courier New\", monospace;">${escapeHtml(u.id)}</span></div>
-            <div class="desc" style="margin:6px 0 0;">profile_id: <span style="font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, \"Liberation Mono\", \"Courier New\", monospace;">${escapeHtml(meta.profile_id || '—')}</span></div>
+            <div class="tag-inline">${pill} <span>${escapeHtml(u.email || '')}</span></div>
+            <div class="desc" style="margin:0;">ID: <span class="mono">${escapeHtml(u.id)}</span></div>
+            <div class="desc" style="margin:0;">profile_id: <span class="mono">${escapeHtml(meta.profile_id || '—')}</span></div>
           </div>
-          <div class="row" style="justify-content:flex-end; gap:8px;">
-            <button class="btn" data-act="select">Selecionar</button>
+          <div class="instCard-actions" style="grid-template-columns:1fr;">
+            <button class="btn sm" data-act="select">Selecionar</button>
           </div>
         `;
         card.querySelector('button[data-act="select"]').onclick = () => {
