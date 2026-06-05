@@ -1,0 +1,1520 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>REDFOX.IA — Central</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="/logo-redfox.png" />
+  <script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js"></script>
+  <style>
+    :root{
+      --bg: #0b0c10;
+      --panel: rgba(255,255,255,.06);
+      --panel2: rgba(255,255,255,.08);
+      --stroke: rgba(255,255,255,.10);
+      --text: rgba(255,255,255,.92);
+      --muted: rgba(255,255,255,.62);
+      --accent: #ff4d4d;
+      --good: #34c759;
+      --warn: #ffcc00;
+      --bad: #ff3b30;
+      --shadow: 0 20px 70px rgba(0,0,0,.55);
+      --radius: 18px;
+      --radius-sm: 14px;
+      --easeOut: cubic-bezier(.2,.8,.2,1);
+      --space-xs: 6px;
+      --space-sm: 10px;
+      --space-md: 14px;
+      --space-lg: 18px;
+      --touch: 44px;
+    }
+    *{ box-sizing: border-box; }
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
+      background: radial-gradient(1200px 700px at 20% 10%, rgba(255,77,77,.10), transparent 60%),
+                  radial-gradient(900px 600px at 80% 20%, rgba(52,199,89,.08), transparent 55%),
+                  radial-gradient(1000px 700px at 50% 90%, rgba(0,122,255,.10), transparent 55%),
+                  var(--bg);
+      color: var(--text);
+      min-height:100vh;
+      min-height:100dvh;
+      padding-bottom: env(safe-area-inset-bottom, 0);
+    }
+    a{ color: inherit; }
+
+    .shell{ max-width: 1280px; margin: 0 auto; padding: 12px; padding-left: max(12px, env(safe-area-inset-left)); padding-right: max(12px, env(safe-area-inset-right)); }
+    .appear{ animation: appear .35s var(--easeOut) both; }
+    @keyframes appear{ from{ opacity:0; transform: translateY(10px); filter: blur(6px);} to{ opacity:1; transform: translateY(0); filter: blur(0);} }
+    .topbar{
+      display: grid;
+      grid-template-columns: 1fr auto;
+      grid-template-areas:
+        "brand actions"
+        "tabs tabs";
+      align-items: center;
+      gap: var(--space-sm);
+      padding: 12px;
+      border:1px solid var(--stroke);
+      border-radius: var(--radius);
+      background: rgba(255,255,255,.05);
+      backdrop-filter: blur(14px);
+      box-shadow: 0 10px 35px rgba(0,0,0,.35);
+      position: sticky; top: 8px; z-index: 20;
+    }
+    .brand{ grid-area: brand; display:flex; align-items:center; gap:12px; min-width: 0; }
+    .logo{
+      width: 34px; height: 34px; border-radius: 12px;
+      background: #fff;
+      box-shadow: 0 4px 14px rgba(0,0,0,.18);
+      object-fit: contain;
+      padding: 4px;
+      flex-shrink: 0;
+      display: block;
+    }
+    .brand h1{ margin:0; font-size: .95rem; letter-spacing:.2px; }
+    .brand .sub{ font-size: .78rem; color: var(--muted); margin-top:2px; line-height: 1.3; }
+    .tabs{
+      grid-area: tabs;
+      display:flex; gap:6px;
+      overflow-x: auto; -webkit-overflow-scrolling: touch;
+      scrollbar-width: none; padding-bottom: 2px;
+      width: 100%;
+    }
+    .tabs::-webkit-scrollbar{ display:none; }
+    .tab{
+      border:1px solid transparent;
+      background: transparent;
+      color: var(--muted);
+      padding: 10px 12px;
+      min-height: 44px;
+      border-radius: 999px;
+      cursor:pointer;
+      font-weight: 650;
+      font-size: .82rem;
+      transition: .18s var(--easeOut);
+      display:flex; align-items:center; gap:8px;
+      flex: 0 0 auto;
+      position: relative;
+      white-space: nowrap;
+    }
+    .tab-label{ display:none; }
+    .tab[aria-selected="true"]{
+      color: var(--text);
+      background: rgba(255,255,255,.08);
+      border-color: rgba(255,255,255,.12);
+    }
+    .tab:after{
+      content:"";
+      position:absolute;
+      left: 14px; right: 14px; bottom: 6px;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, rgba(255,77,77,.95), transparent);
+      opacity: 0;
+      transform: scaleX(.6);
+      transition: .18s var(--easeOut);
+      border-radius: 999px;
+    }
+    .tab[aria-selected="true"]:after{ opacity: .95; transform: scaleX(1); }
+    .tab:hover{ transform: translateY(-1px); color: rgba(255,255,255,.82); }
+    .tab:active{ transform: translateY(0); }
+    .right{ grid-area: actions; display:flex; align-items:center; justify-content:flex-end; gap:8px; flex-wrap:nowrap; }
+    .right .btn{ padding: 10px 12px; min-height: 40px; font-size: .82rem; }
+    .right .chip{ display:none; }
+    .chip span:last-child{ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width: 52vw; }
+    .chip{
+      padding: 8px 12px;
+      border-radius: 999px;
+      border:1px solid var(--stroke);
+      background: rgba(255,255,255,.04);
+      color: var(--muted);
+      font-size:.82rem;
+      display:flex; align-items:center; gap:8px;
+    }
+    .btn{
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.06);
+      color: var(--text);
+      padding: 12px 14px;
+      min-height: 44px;
+      border-radius: 12px;
+      cursor:pointer;
+      font-weight: 700;
+      font-size: .9rem;
+      transition: .18s var(--easeOut);
+      display:inline-flex; align-items:center; justify-content:center; gap:8px;
+      position: relative;
+      overflow: hidden;
+      touch-action: manipulation;
+    }
+    .btn.primary{
+      background: linear-gradient(135deg, rgba(255,77,77,1), rgba(255,77,77,.75));
+      border-color: rgba(255,77,77,.55);
+      box-shadow: 0 18px 45px rgba(255,77,77,.20);
+    }
+    .btn:disabled{ opacity:.55; cursor:not-allowed; }
+    .btn:hover{ transform: translateY(-1px); border-color: rgba(255,255,255,.22); background: rgba(255,255,255,.08); }
+    .btn.primary:hover{ filter: saturate(1.06); }
+    .btn:active{ transform: translateY(0); }
+    .btn.sm{ padding: 9px 11px; min-height: 38px; font-size: .82rem; }
+    .btn.ghost{ background: transparent; border-color: rgba(255,255,255,.08); }
+    .btn.danger{ border-color: rgba(255,59,48,.45); color: rgba(255,180,175,.95); }
+    .btn.danger:hover{ background: rgba(255,59,48,.12); }
+    .btn:before{
+      content:"";
+      position:absolute;
+      inset:-120% -140%;
+      background: linear-gradient(110deg, transparent 30%, rgba(255,255,255,.14) 45%, transparent 60%);
+      transform: translateX(-20%) rotate(12deg);
+      opacity:0;
+      transition: .25s var(--easeOut);
+    }
+    .btn:hover:before{ opacity:1; transform: translateX(35%) rotate(12deg); }
+
+    .grid{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap: var(--space-md);
+      margin-top: var(--space-md);
+    }
+    .grid-instances{ grid-template-columns: 1fr; }
+    .card{
+      background: rgba(255,255,255,.05);
+      border: 1px solid var(--stroke);
+      border-radius: var(--radius);
+      padding: var(--space-md);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(14px);
+      transform: translateZ(0);
+      transition: .22s var(--easeOut);
+    }
+    .card-head{
+      display:flex; align-items:flex-start; justify-content:space-between;
+      gap: var(--space-sm); flex-wrap:wrap;
+      margin-bottom: var(--space-md);
+    }
+    .card-head h2{ margin:0; }
+    .card-head .desc{ margin:4px 0 0; flex: 1 1 100%; }
+    .card-head-actions{ display:flex; gap:8px; flex-wrap:wrap; flex-shrink:0; }
+    .card-span{ grid-column: 1 / -1; }
+    @media (hover: hover){
+      .card:hover{ border-color: rgba(255,255,255,.16); transform: translateY(-1px); }
+    }
+    .card h2{ margin:0 0 var(--space-sm); font-size: .95rem; color: rgba(255,255,255,.88); letter-spacing:.01em; }
+    .desc{ color: var(--muted); font-size: .86rem; margin: 0 0 var(--space-md); line-height: 1.45; }
+    textarea, input, select.select{
+      width:100%;
+      background: rgba(0,0,0,.22);
+      border: 1px solid rgba(255,255,255,.10);
+      color: var(--text);
+      border-radius: var(--radius-sm);
+      padding: 12px 12px;
+      outline: none;
+      transition: .18s var(--easeOut);
+    }
+    select.select{ cursor:pointer; appearance:none; background-image: linear-gradient(45deg, transparent 50%, rgba(255,255,255,.45) 50%), linear-gradient(135deg, rgba(255,255,255,.45) 50%, transparent 50%); background-position: calc(100% - 18px) calc(50% + 2px), calc(100% - 13px) calc(50% + 2px); background-size: 5px 5px, 5px 5px; background-repeat: no-repeat; padding-right: 34px; }
+    textarea{ min-height: 200px; resize: vertical; font-size: 16px; line-height: 1.45; }
+    input, select.select{ font-size: 16px; }
+    textarea:focus, input:focus, select.select:focus{ border-color: rgba(255,255,255,.22); background-color: rgba(0,0,0,.28); box-shadow: 0 0 0 3px rgba(255,77,77,.12); }
+
+    .field{ display:flex; flex-direction:column; gap: var(--space-xs); }
+    .field-label{ font-size: .74rem; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: rgba(255,255,255,.52); }
+    .field-row{ display:flex; flex-wrap:wrap; gap: 8px; align-items: stretch; }
+    .field-row > input,
+    .field-row > select.select{ flex: 1 1 140px; min-width: 0; width: auto; }
+    .field-row > .btn{ flex: 0 0 auto; width: auto; min-width: var(--touch); }
+
+    .sections{ display:flex; flex-direction:column; gap: var(--space-md); }
+    .section{
+      padding: var(--space-md);
+      border-radius: var(--radius-sm);
+      border: 1px solid rgba(255,255,255,.08);
+      background: rgba(0,0,0,.16);
+    }
+    .section-title{ margin:0 0 4px; font-size: .84rem; font-weight: 800; color: rgba(255,255,255,.88); }
+    .section-desc{ margin:0 0 var(--space-sm); font-size: .8rem; color: var(--muted); line-height: 1.4; }
+
+    .btn-bar{
+      display:flex; flex-wrap:wrap; gap: 8px; align-items:stretch;
+      margin-top: var(--space-sm);
+    }
+    .btn-bar .btn{ flex: 1 1 calc(50% - 4px); min-width: 0; }
+    .btn-bar.end{ justify-content:flex-end; }
+    .btn-bar.end .btn{ flex: 0 0 auto; width: auto; min-width: var(--touch); }
+    .btn-bar.stack .btn{ flex: 1 1 100%; }
+
+    .btn-grid{
+      display:grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+    }
+    .btn-grid.cols-4{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+    .toolbar{
+      display:flex; flex-direction:column; gap: 8px;
+      padding: var(--space-sm);
+      border-radius: var(--radius-sm);
+      border: 1px solid rgba(255,255,255,.07);
+      background: rgba(0,0,0,.14);
+      margin-bottom: var(--space-md);
+    }
+    .toolbar-row{ display:flex; flex-wrap:wrap; gap: 8px; align-items: stretch; }
+    .toolbar-row > input{ flex: 1 1 180px; min-width: 0; width: auto; }
+    .toolbar-row > select.select{ flex: 0 1 170px; min-width: 0; width: auto; }
+    .toolbar-row > .btn{ flex: 0 0 auto; width: auto; }
+
+    .panel-nested{
+      margin-top: var(--space-md);
+      padding: var(--space-md);
+      border-radius: var(--radius-sm);
+      border: 1px dashed rgba(255,255,255,.12);
+      background: rgba(0,0,0,.12);
+    }
+    .panel-nested h2{ margin-top:0; font-size: .9rem; }
+
+    .row{ display:flex; flex-direction:column; gap:10px; align-items:stretch; }
+    .row > *{ width: 100%; }
+    .row.inline{ flex-direction:row; flex-wrap:wrap; align-items:center; }
+    .row.inline > *{ width: auto; flex: 1 1 auto; }
+    .row .btn{ width: 100%; }
+    .row.inline .btn{ width: auto; flex: 0 0 auto; min-width: 44px; }
+    @media (max-width: 767px){
+      .row.inline{ flex-wrap: wrap; }
+      .row.inline > select,
+      .row.inline > input{ min-width: 0 !important; flex: 1 1 100%; }
+      .row.inline > input#chatInput{ flex: 1 1 auto; min-width: 0; }
+      .row.inline > #btnSend{ flex: 0 0 auto; width: auto; }
+    }
+
+    .chat{
+      display:flex; flex-direction:column; gap:10px;
+      max-height: min(42vh, 330px); overflow:auto;
+      padding-right: 2px;
+      -webkit-overflow-scrolling: touch;
+    }
+    .msg{ padding: 10px 12px; border-radius: 14px; border:1px solid rgba(255,255,255,.08); }
+    .msg.ai{ background: rgba(52,199,89,.10); }
+    .msg.user{ background: rgba(0,122,255,.12); }
+    .msg.system{ background: rgba(255,204,0,.10); border-color: rgba(255,204,0,.18); color: rgba(255,255,255,.9); }
+    .msg .meta{ font-size:.72rem; color: var(--muted); margin-bottom:6px; }
+
+    .summary{
+      white-space: pre-wrap;
+      background: rgba(0,0,0,.22);
+      border: 1px solid rgba(255,255,255,.10);
+      border-radius: 14px;
+      padding: 12px;
+      font-size: .86rem;
+      min-height: 130px;
+    }
+
+    /* Instances */
+    .instList{ display:flex; flex-direction:column; gap: var(--space-sm); }
+    .instCard{
+      border-radius: var(--radius-sm);
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.22);
+      padding: var(--space-md);
+      display:grid;
+      grid-template-columns: 1fr;
+      gap: var(--space-sm);
+      transition: .18s var(--easeOut);
+    }
+    .instCard-main{ min-width: 0; }
+    .instCard-meta{ display:flex; flex-wrap:wrap; align-items:center; gap: 8px; margin-top: 6px; }
+    .instCard-meta .evo{ color: var(--muted); font-size: .78rem; word-break: break-all; }
+    .instCard-actions{ display:grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+    @media (hover: hover){
+      .instCard:hover{ transform: translateY(-1px); border-color: rgba(255,255,255,.16); background: rgba(0,0,0,.26); }
+    }
+    .instTitle{ font-weight:800; letter-spacing:.2px; font-size: .92rem; line-height: 1.25; }
+    .pill{
+      display:inline-flex; align-items:center; gap:6px;
+      border-radius: 999px; padding: 6px 10px;
+      font-size:.78rem; border:1px solid rgba(255,255,255,.12);
+      color: rgba(255,255,255,.85);
+      background: rgba(255,255,255,.06);
+    }
+    .dot{ width:8px; height:8px; border-radius: 99px; background: var(--muted); }
+    .pill.good .dot{ background: var(--good); }
+    .pill.warn .dot{ background: var(--warn); }
+    .pill.bad .dot{ background: var(--bad); }
+    .pill.neutral .dot{ background: #8e8e93; }
+
+    /* Toasts */
+    .toasts{
+      position: fixed; left: 12px; right: 12px; bottom: max(12px, env(safe-area-inset-bottom));
+      display:flex; flex-direction:column; gap:10px; z-index: 50;
+      pointer-events: none;
+    }
+    .toast{
+      width: 100%; max-width: 100%;
+      pointer-events: auto;
+      border-radius: 16px;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(20,22,28,.88);
+      backdrop-filter: blur(16px);
+      box-shadow: 0 22px 60px rgba(0,0,0,.55);
+      padding: 12px;
+      animation: in .18s ease-out;
+    }
+    @keyframes in{ from{ transform: translateY(8px); opacity:0;} to{ transform: translateY(0); opacity:1;} }
+    .toast .t{ font-weight: 800; }
+    .toast .m{ margin-top:4px; color: rgba(255,255,255,.72); font-size:.86rem; line-height:1.35; }
+
+    /* Modal */
+    .modalBack{
+      position: fixed; inset:0; background: rgba(0,0,0,.55);
+      backdrop-filter: blur(6px);
+      display:none; align-items:flex-end; justify-content:center;
+      padding: 0; z-index: 60;
+    }
+    .modalBack[data-open="true"]{ display:flex; }
+    .modal{
+      width: 100%;
+      max-height: 94dvh;
+      overflow-y: auto;
+      border-radius: 22px 22px 0 0;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(18,20,26,.94);
+      box-shadow: 0 40px 120px rgba(0,0,0,.65);
+      overflow:hidden;
+      animation: pop .22s var(--easeOut) both;
+    }
+    @keyframes pop{ from{ transform: translateY(10px) scale(.98); opacity:.0;} to{ transform: translateY(0) scale(1); opacity:1;} }
+    .modalHeader{
+      display:flex; align-items:center; justify-content:space-between;
+      padding: 14px 16px;
+      border-bottom: 1px solid rgba(255,255,255,.10);
+    }
+    .modalHeader .title{ font-weight: 900; }
+    .modalBody{ padding: 16px; display:grid; grid-template-columns: 1fr; gap: 14px; }
+    .qrBox{
+      background: #fff;
+      border-radius: 16px;
+      padding: 14px;
+      display:flex; align-items:center; justify-content:center;
+      min-height: 260px;
+    }
+    .qrBox img{ max-width: 320px; width: 100%; height: auto; border-radius: 10px; }
+    .modalFooter{
+      padding: 14px 16px;
+      border-top: 1px solid rgba(255,255,255,.10);
+      display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end;
+    }
+
+    .hide{ display:none !important; }
+
+    /* Ícones via Iconify (Lucide / MDI) */
+    iconify-icon.ico{
+      width: 18px; height: 18px;
+      flex: 0 0 18px;
+      color: rgba(255,255,255,.88);
+    }
+    .tab iconify-icon.ico{ color: rgba(255,255,255,.68); }
+    .tab[aria-selected="true"] iconify-icon.ico{ color: rgba(255,255,255,.95); }
+    .chip iconify-icon.ico{ color: rgba(255,255,255,.65); }
+    .btn.primary iconify-icon.ico{ color: #fff; }
+
+    /* Desktop — escala a partir do mobile */
+    @media (min-width: 768px){
+      .shell{ padding: 22px; }
+      .topbar{
+        display:flex; flex-direction: row; align-items: center; justify-content: space-between;
+        padding: 14px 16px; border-radius: 999px; top: 14px;
+        grid-template-columns: none; grid-template-areas: none;
+      }
+      .brand{ grid-area: auto; flex: 0 0 auto; }
+      .tabs{ grid-area: auto; flex: 1; justify-content: center; overflow: visible; max-width: 520px; margin: 0 auto; }
+      .right{ grid-area: auto; width: auto; flex-wrap: nowrap; }
+      .right .chip{ display:flex; }
+      .tab{ padding: 10px 14px; font-size: inherit; }
+      .tab-label{ display: inline; }
+      .chip span:last-child{ max-width: 220px; }
+      .grid{ grid-template-columns: 1.15fr .85fr; gap: var(--space-lg); margin-top: var(--space-lg); }
+      .grid-instances{ grid-template-columns: minmax(300px, 1fr) minmax(360px, 1.05fr); }
+      .card{ padding: var(--space-lg); }
+      .card:hover{ border-color: rgba(255,255,255,.16); transform: translateY(-1px); }
+      textarea{ min-height: 260px; }
+      .row{ flex-direction: row; flex-wrap: wrap; align-items: center; }
+      .row > *{ width: auto; flex: 1 1 auto; }
+      .row .btn{ width: auto; flex: 0 0 auto; }
+      .btn-bar .btn{ flex: 0 0 auto; width: auto; min-width: var(--touch); }
+      .btn-bar.stack .btn{ flex: 0 0 auto; width: auto; }
+      .btn-grid.cols-4{ grid-template-columns: repeat(4, minmax(0, 1fr)); }
+      .instCard{ grid-template-columns: 1fr auto; align-items: center; gap: var(--space-md); }
+      .instCard-actions{ grid-template-columns: repeat(4, auto); display:flex; flex-wrap:wrap; justify-content:flex-end; }
+      .instCard-actions .btn{ min-width: 0; }
+      .toolbar{ flex-direction: row; flex-wrap: wrap; align-items: center; }
+      .toolbar-row{ flex: 1 1 auto; }
+      .toasts{ left: auto; right: 18px; bottom: 18px; width: 360px; }
+      .toast{ width: 360px; }
+      .modalBack{ align-items: center; padding: 18px; }
+      .modal{ width: min(860px, 100%); border-radius: 22px; max-height: none; }
+      .modalBody{ grid-template-columns: 1fr 1fr; }
+    }
+    @media (min-width: 480px){
+      .btn-grid.cols-4{ grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell appear">
+    <div class="topbar" role="navigation" aria-label="Navegação">
+      <div class="brand">
+        <img
+          class="logo"
+          src="https://storage.googleapis.com/hostinger-horizons-assets-prod/538b41a0-ff00-4ec3-bb08-8ee3dc27220d/aacf7730ad448b697bec08f7745a9559.png"
+          alt="REDFOX"
+          width="34"
+          height="34"
+          onerror="this.onerror=null;this.src='/logo-redfox.png';"
+        />
+        <div>
+          <h1>REDFOX.IA Central</h1>
+          <div class="sub">Agendamentos (Cal.com) + WhatsApp (UazAPI)</div>
+        </div>
+      </div>
+
+      <div class="tabs" role="tablist" aria-label="Seções">
+        <button class="tab" id="tabIntake" role="tab" aria-selected="true"><iconify-icon class="ico" icon="lucide:calendar" aria-hidden="true"></iconify-icon><span class="tab-label">Agendamentos</span></button>
+        <button class="tab" id="tabInstances" role="tab" aria-selected="false"><iconify-icon class="ico" icon="mdi:whatsapp" aria-hidden="true"></iconify-icon><span class="tab-label">WhatsApp</span></button>
+        <button class="tab" id="tabSupabase" role="tab" aria-selected="false"><iconify-icon class="ico" icon="lucide:database" aria-hidden="true"></iconify-icon><span class="tab-label">Supabase</span></button>
+        <button class="tab" id="tabAuth" role="tab" aria-selected="false"><iconify-icon class="ico" icon="lucide:shield-check" aria-hidden="true"></iconify-icon><span class="tab-label">Autenticação</span></button>
+      </div>
+
+      <div class="right">
+        <div class="chip" id="chipServer"><iconify-icon class="ico" icon="lucide:link" aria-hidden="true"></iconify-icon><span>Servidor: local</span></div>
+        <button class="btn" id="btnHelp"><iconify-icon class="ico" icon="lucide:circle-help" aria-hidden="true"></iconify-icon>Ajuda</button>
+      </div>
+    </div>
+
+    <!-- Intake -->
+    <div id="viewIntake">
+      <div class="grid">
+        <div class="card">
+          <h2>1) Cole as informações da clínica</h2>
+          <p class="desc">Cole o questionário completo. A IA vai extrair nome, horários, duração, fuso e endereço. Se algo estiver faltando, ela pergunta.</p>
+          <textarea id="questionnaire" placeholder="Cole aqui o questionário completo..."></textarea>
+          <div class="btn-bar">
+            <button class="btn primary" id="btnAnalyze"><iconify-icon class="ico" icon="lucide:sparkles" aria-hidden="true"></iconify-icon>Analisar com IA</button>
+            <button class="btn ghost" id="btnClear"><iconify-icon class="ico" icon="lucide:trash-2" aria-hidden="true"></iconify-icon>Limpar</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>2) Chat com a IA</h2>
+          <p class="desc">Responda às perguntas para fechar a configuração. Ex.: “duração é 40 minutos”.</p>
+          <div class="chat" id="chat" aria-live="polite"></div>
+          <div class="field-row" style="margin-top:10px;">
+            <input id="chatInput" placeholder="Digite sua resposta..." disabled />
+            <button class="btn primary" id="btnSend" disabled><iconify-icon class="ico" icon="lucide:send" aria-hidden="true"></iconify-icon>Enviar</button>
+          </div>
+        </div>
+
+        <div class="card card-span">
+          <h2>3) Revisão e criação</h2>
+          <p class="desc">Confira o resumo e clique em “Criar no Cal.com”. Vai abrir uma janela do Chrome para você resolver o captcha.</p>
+          <div class="summary" id="summary">Aguardando análise...</div>
+          <div class="btn-bar end">
+            <button class="btn primary" id="btnCreate" disabled><iconify-icon class="ico" icon="lucide:play" aria-hidden="true"></iconify-icon>Criar no Cal.com</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Instances -->
+    <div id="viewInstances" class="hide">
+      <div class="grid grid-instances">
+        <div class="card">
+          <div class="card-head">
+            <div>
+              <h2>Configurar instância</h2>
+              <p class="desc">Crie, conecte por QR ou pareamento e configure o webhook.</p>
+            </div>
+          </div>
+
+          <div class="sections">
+            <div class="section">
+              <div class="section-title">Nova instância</div>
+              <p class="section-desc">Nome único usado na UazAPI (ex.: leo-beraldo).</p>
+              <div class="field-row">
+                <input id="instName" placeholder="Nome único (ex.: leo-beraldo)" />
+                <button class="btn primary" id="btnInstCreate"><iconify-icon class="ico" icon="lucide:plus" aria-hidden="true"></iconify-icon>Criar</button>
+              </div>
+            </div>
+
+            <div class="section">
+              <div class="section-title">Conexão</div>
+              <p class="section-desc">Selecione uma instância na lista ou cole o token manualmente.</p>
+              <div class="field">
+                <label class="field-label" for="instToken">Token</label>
+                <input id="instToken" placeholder="Token da instância selecionada" />
+              </div>
+              <div class="btn-bar">
+                <button class="btn primary" id="btnConnectQr"><iconify-icon class="ico" icon="lucide:qr-code" aria-hidden="true"></iconify-icon>Conectar via QR</button>
+                <button class="btn" id="btnStatus"><iconify-icon class="ico" icon="lucide:activity" aria-hidden="true"></iconify-icon>Ver status</button>
+              </div>
+            </div>
+
+            <div class="section">
+              <div class="section-title">Pareamento (opcional)</div>
+              <p class="section-desc">Alternativa ao QR — informe o número com DDI.</p>
+              <div class="field-row">
+                <input id="pairPhone" placeholder="Telefone (ex.: 5517999999999)" />
+                <button class="btn" id="btnConnectPair"><iconify-icon class="ico" icon="lucide:smartphone" aria-hidden="true"></iconify-icon>Parear</button>
+              </div>
+            </div>
+
+            <div class="section">
+              <div class="section-title">Webhook</div>
+              <p class="section-desc">Escuta somente mensagens. Ignora wasSentByApi e grupos.</p>
+              <div class="field-row">
+                <select id="whEnv" class="select" style="flex:0 0 auto; min-width: 160px;">
+                  <option value="test">Teste</option>
+                  <option value="production">Produção</option>
+                  <option value="custom">Personalizado</option>
+                </select>
+                <input id="whUrl" placeholder="URL do webhook (opcional)" />
+              </div>
+              <div class="btn-bar">
+                <button class="btn primary" id="btnWebhook"><iconify-icon class="ico" icon="lucide:zap" aria-hidden="true"></iconify-icon>Ativar webhook</button>
+                <button class="btn ghost" id="btnOpenLocalWebhook"><iconify-icon class="ico" icon="lucide:map-pin" aria-hidden="true"></iconify-icon>URL local (teste)</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head">
+            <div>
+              <h2>Suas instâncias</h2>
+              <p class="desc">Toque para selecionar e usar as ações rápidas.</p>
+            </div>
+            <div class="card-head-actions">
+              <button class="btn sm" id="btnRefresh"><iconify-icon class="ico" icon="lucide:refresh-cw" aria-hidden="true"></iconify-icon>Atualizar</button>
+            </div>
+          </div>
+
+          <div class="instList" id="instList"></div>
+
+          <div class="panel-nested">
+            <h2>Log / resposta</h2>
+            <div class="summary" id="uazOut">—</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Supabase -->
+    <div id="viewSupabase" class="hide">
+      <div class="grid">
+        <div class="card">
+          <h2>Perfis <span style="font-family: ui-monospace, monospace; font-size:.82em; opacity:.75;">profiles</span></h2>
+          <p class="desc">Pesquise, ordene e edite. Clique num perfil na lista para carregar à direita.</p>
+
+          <div class="toolbar">
+            <div class="toolbar-row">
+              <input id="sbQuery" placeholder="Pesquisar (nome, clínica, evo, número...)" />
+              <select id="sbAtiva" class="select">
+                <option value="all">Todos</option>
+                <option value="true">Somente ativos</option>
+                <option value="false">Somente inativos</option>
+              </select>
+              <button class="btn sm" id="sbRefresh"><iconify-icon class="ico" icon="lucide:refresh-cw" aria-hidden="true"></iconify-icon>Atualizar</button>
+            </div>
+            <div class="toolbar-row">
+              <select id="sbSort" class="select" style="flex:1 1 220px;"></select>
+              <select id="sbOrder" class="select" style="flex:0 0 120px;">
+                <option value="desc">Desc</option>
+                <option value="asc">Asc</option>
+              </select>
+              <button class="btn sm" id="sbPrev" title="Página anterior"><iconify-icon class="ico" icon="lucide:chevron-left" aria-hidden="true"></iconify-icon></button>
+              <button class="btn sm" id="sbNext" title="Próxima página"><iconify-icon class="ico" icon="lucide:chevron-right" aria-hidden="true"></iconify-icon></button>
+            </div>
+          </div>
+
+          <div class="desc" id="sbInfo">—</div>
+          <div class="summary" id="sbTable" style="margin-top:10px; white-space: normal; overflow:auto; max-height: min(52vh, 520px);"></div>
+        </div>
+
+        <div class="card">
+          <h2>Edição rápida</h2>
+          <p class="desc">Alterações são salvas direto no Supabase.</p>
+
+          <div class="sections">
+            <div class="field">
+              <label class="field-label" for="sbEditId">ID do perfil</label>
+              <input id="sbEditId" placeholder="Selecione um perfil na lista" disabled />
+            </div>
+            <div class="field">
+              <label class="field-label" for="sbEditName">Nome</label>
+              <input id="sbEditName" placeholder="Nome" />
+            </div>
+            <div class="field">
+              <label class="field-label" for="sbEditClinic">Clínica</label>
+              <input id="sbEditClinic" placeholder="Nome da clínica" />
+            </div>
+            <div class="field">
+              <label class="field-label" for="sbEditEvo">EVO (slug)</label>
+              <input id="sbEditEvo" placeholder="evo" />
+            </div>
+            <div class="field">
+              <label class="field-label" for="sbEditNumero">Número (WhatsApp)</label>
+              <input id="sbEditNumero" placeholder="5531999999999" />
+            </div>
+            <div class="field">
+              <label class="field-label" for="sbEditAtiva">Status</label>
+              <select id="sbEditAtiva" class="select">
+                <option value="true">Ativo</option>
+                <option value="false">Inativo</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="btn-bar end">
+            <button class="btn primary" id="sbSave"><iconify-icon class="ico" icon="lucide:save" aria-hidden="true"></iconify-icon>Salvar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Auth -->
+    <div id="viewAuth" class="hide">
+      <div class="grid">
+        <div class="card">
+          <h2>Usuários Auth</h2>
+          <p class="desc">Pesquisar, ativar/desativar e vincular ao profile.</p>
+
+          <div class="toolbar">
+            <div class="toolbar-row">
+              <input id="authQuery" placeholder="Pesquisar (email, nome, clínica, profile_id...)" />
+              <button class="btn sm" id="authRefresh"><iconify-icon class="ico" icon="lucide:refresh-cw" aria-hidden="true"></iconify-icon>Atualizar</button>
+            </div>
+          </div>
+
+          <div class="summary" id="authList" style="white-space: normal; overflow:auto; max-height: min(52vh, 520px);"></div>
+        </div>
+
+        <div class="card">
+          <h2>Criar usuário</h2>
+          <p class="desc">Cria o profile automaticamente e grava user_metadata.profile_id.</p>
+
+          <div class="sections">
+            <div class="field">
+              <label class="field-label" for="authNewEmail">E-mail</label>
+              <input id="authNewEmail" placeholder="email@dominio.com" />
+            </div>
+            <div class="field">
+              <label class="field-label" for="authNewPass">Senha</label>
+              <input id="authNewPass" placeholder="Mínimo 6 caracteres" />
+            </div>
+            <div class="field">
+              <label class="field-label" for="authNewName">Nome</label>
+              <input id="authNewName" placeholder="Nome do responsável" />
+            </div>
+            <div class="field">
+              <label class="field-label" for="authNewClinic">Clínica</label>
+              <input id="authNewClinic" placeholder="Nome da clínica" />
+            </div>
+            <div class="field">
+              <label class="field-label" for="authNewFirst">Primeiro nome (opcional)</label>
+              <input id="authNewFirst" placeholder="Ex.: Juliana" />
+            </div>
+          </div>
+
+          <div class="btn-bar end">
+            <button class="btn primary" id="authCreate"><iconify-icon class="ico" icon="lucide:user-plus" aria-hidden="true"></iconify-icon>Criar usuário</button>
+          </div>
+
+          <div class="panel-nested">
+            <h2>Detalhes do usuário selecionado</h2>
+            <div class="sections">
+              <div class="field">
+                <label class="field-label" for="authSelId">User ID</label>
+                <input id="authSelId" placeholder="Selecione na lista" disabled />
+              </div>
+              <div class="field">
+                <label class="field-label" for="authEditEmail">E-mail</label>
+                <input id="authEditEmail" placeholder="email@dominio.com" />
+              </div>
+              <div class="field">
+                <label class="field-label" for="authEditPass">Nova senha (opcional)</label>
+                <input id="authEditPass" placeholder="Deixe em branco para não alterar" />
+              </div>
+              <div class="field">
+                <label class="field-label" for="authEditName">Nome (metadata)</label>
+                <input id="authEditName" placeholder="Nome" />
+              </div>
+              <div class="field">
+                <label class="field-label" for="authEditClinic">Clínica (metadata)</label>
+                <input id="authEditClinic" placeholder="Clínica" />
+              </div>
+            </div>
+
+            <div class="btn-bar end">
+              <button class="btn primary" id="authSave"><iconify-icon class="ico" icon="lucide:pencil" aria-hidden="true"></iconify-icon>Salvar alterações</button>
+            </div>
+            <div class="btn-bar">
+              <button class="btn" id="authActivate"><iconify-icon class="ico" icon="lucide:unlock" aria-hidden="true"></iconify-icon>Ativar</button>
+              <button class="btn danger" id="authDeactivate"><iconify-icon class="ico" icon="lucide:lock" aria-hidden="true"></iconify-icon>Desativar</button>
+            </div>
+            <div class="field-row" style="margin-top:8px;">
+              <input id="authLinkProfileId" placeholder="profile_id (uuid) para vincular" />
+              <button class="btn" id="authLink"><iconify-icon class="ico" icon="lucide:link" aria-hidden="true"></iconify-icon>Vincular</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- QR Modal -->
+  <div class="modalBack" id="qrModalBack" role="dialog" aria-modal="true" aria-label="QR Code">
+    <div class="modal">
+      <div class="modalHeader">
+        <div class="title" id="qrTitle">QR Code</div>
+        <button class="btn" id="btnQrClose">Fechar</button>
+      </div>
+      <div class="modalBody">
+        <div class="qrBox">
+          <img id="qrImg" alt="QR Code" />
+        </div>
+        <div>
+          <div class="desc" style="margin-top:0;">Escaneie com o WhatsApp do celular para conectar a instância.</div>
+          <div class="btn-bar">
+            <button class="btn primary sm" id="btnQrCopy">Copiar imagem</button>
+            <button class="btn sm" id="btnQrDownload">Baixar</button>
+            <button class="btn sm" id="btnQrShare">Compartilhar</button>
+            <button class="btn sm" id="btnQrWhatsapp">WhatsApp Web</button>
+          </div>
+          <div class="desc" style="margin-top:10px;">
+            Dica: se “Compartilhar” não estiver disponível no seu navegador, use “Copiar imagem” e cole onde precisar.
+          </div>
+        </div>
+      </div>
+      <div class="modalFooter">
+        <button class="btn" id="btnQrClose2">Fechar</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toasts" id="toasts" aria-live="polite"></div>
+
+  <script>
+    const sessionId = crypto.randomUUID();
+    const state = {
+      intakeReady: false,
+      lastResult: null,
+      lastQrDataUrl: null,
+      lastQrFileName: 'qrcode.png',
+      selectedInstance: null,
+    };
+
+    const el = (id) => document.getElementById(id);
+
+    function toast(title, message) {
+      const wrap = el('toasts');
+      const t = document.createElement('div');
+      t.className = 'toast';
+      t.innerHTML = `<div class="t">${title}</div><div class="m">${message}</div>`;
+      wrap.appendChild(t);
+      setTimeout(() => { t.style.opacity = '0'; t.style.transition='opacity .2s ease'; }, 3200);
+      setTimeout(() => t.remove(), 3600);
+    }
+
+    async function api(path, body) {
+      const res = await fetch(path, { method: 'POST', headers: { 'Content-Type':'application/json' }, body: JSON.stringify(body||{}) });
+      const ct = (res.headers.get('content-type') || '').toLowerCase();
+      const text = await res.text();
+      let data = null;
+      if (ct.includes('application/json')) {
+        try { data = text ? JSON.parse(text) : null; } catch { data = null; }
+      }
+      if (!res.ok) {
+        const msg = (data && (data.error || data.message)) || text || `HTTP ${res.status}`;
+        throw new Error(msg);
+      }
+      if (data !== null) return data;
+      // Caso raro: sucesso com texto puro
+      return { ok: true, raw: text };
+    }
+
+    function setTab(tab) {
+      const intake = tab === 'intake';
+      const instances = tab === 'instances';
+      const supabase = tab === 'supabase';
+      const auth = tab === 'auth';
+
+      el('tabIntake').setAttribute('aria-selected', intake ? 'true' : 'false');
+      el('tabInstances').setAttribute('aria-selected', instances ? 'true' : 'false');
+      el('tabSupabase').setAttribute('aria-selected', supabase ? 'true' : 'false');
+      el('tabAuth').setAttribute('aria-selected', auth ? 'true' : 'false');
+
+      el('viewIntake').classList.toggle('hide', !intake);
+      el('viewInstances').classList.toggle('hide', !instances);
+      el('viewSupabase').classList.toggle('hide', !supabase);
+      el('viewAuth').classList.toggle('hide', !auth);
+    }
+
+    el('tabIntake').onclick = () => setTab('intake');
+    el('tabInstances').onclick = () => { setTab('instances'); refreshInstances().catch(()=>{}); };
+    el('tabSupabase').onclick = () => { setTab('supabase'); refreshWebhookEnvs().catch(()=>{}); refreshProfiles().catch(()=>{}); };
+    el('tabAuth').onclick = () => { setTab('auth'); refreshAuthUsers().catch(()=>{}); };
+
+    // Intake logic
+    const chat = el('chat');
+    function addMsg(kind, text) {
+      const d = document.createElement('div');
+      d.className = `msg ${kind}`;
+      const meta = kind === 'user' ? 'Você' : (kind === 'ai' ? 'IA' : 'Sistema');
+      d.innerHTML = `<div class="meta">${meta}</div><div>${escapeHtml(text)}</div>`;
+      chat.appendChild(d);
+      chat.scrollTop = chat.scrollHeight;
+    }
+    function escapeHtml(s) {
+      return String(s).replace(/[&<>\"]/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;'}[c]));
+    }
+    function handleResult(data) {
+      state.lastResult = data;
+      el('summary').textContent = data.summary_pt || '—';
+      state.intakeReady = data.status === 'ready';
+      el('btnCreate').disabled = !state.intakeReady;
+
+      if (data.questions?.length) {
+        data.questions.forEach((q) => addMsg('ai', q));
+        el('chatInput').disabled = false;
+        el('btnSend').disabled = false;
+      } else if (state.intakeReady) {
+        addMsg('system', 'Tudo pronto. Clique em “Criar no Cal.com”.');
+        el('chatInput').disabled = true;
+        el('btnSend').disabled = true;
+        toast('Pronto para criar', 'Resumo completo e validado.');
+      }
+    }
+
+    el('btnAnalyze').onclick = async () => {
+      const text = el('questionnaire').value.trim();
+      if (!text) return toast('Falta informação', 'Cole o questionário para analisar.');
+      addMsg('system', 'Analisando questionário...');
+      el('btnAnalyze').disabled = true;
+      try {
+        const data = await api('/api/analyze', { sessionId, text });
+        handleResult(data);
+      } catch (e) {
+        toast('Erro', e.message);
+        addMsg('system', 'Erro: ' + e.message);
+      } finally {
+        el('btnAnalyze').disabled = false;
+      }
+    };
+
+    el('btnClear').onclick = () => {
+      el('questionnaire').value = '';
+      chat.innerHTML = '';
+      el('summary').textContent = 'Aguardando análise...';
+      el('chatInput').value = '';
+      el('chatInput').disabled = true;
+      el('btnSend').disabled = true;
+      el('btnCreate').disabled = true;
+      state.intakeReady = false;
+      state.lastResult = null;
+      toast('Limpo', 'Você pode colar um novo questionário.');
+    };
+
+    el('btnSend').onclick = async () => {
+      const answer = el('chatInput').value.trim();
+      if (!answer) return;
+      addMsg('user', answer);
+      el('chatInput').value = '';
+      el('btnSend').disabled = true;
+      try {
+        const data = await api('/api/followup', { sessionId, answer });
+        handleResult(data);
+      } catch (e) {
+        toast('Erro', e.message);
+        addMsg('system', 'Erro: ' + e.message);
+      } finally {
+        el('btnSend').disabled = false;
+      }
+    };
+    el('chatInput').onkeydown = (e) => { if (e.key === 'Enter') el('btnSend').click(); };
+
+    el('btnCreate').onclick = async () => {
+      if (!state.intakeReady) return;
+      el('btnCreate').disabled = true;
+      addMsg('system', 'Abrindo robô do Cal.com...');
+      try {
+        const data = await api('/api/create', { sessionId });
+        toast('Janela aberta', 'Resolva o captcha no Chrome para finalizar.');
+        addMsg('system', data.message || 'Janela aberta.');
+      } catch (e) {
+        toast('Erro', e.message);
+        addMsg('system', 'Erro: ' + e.message);
+        el('btnCreate').disabled = false;
+      }
+    };
+
+    // Instances logic
+    function statusPill(statusRaw) {
+      const s = String(statusRaw || '').toLowerCase();
+      const connected = /(open|connected|online|ready)/i.test(s);
+      const connecting = /(qr|pair|connecting|scan)/i.test(s);
+      const bad = /(close|closed|offline|error|disconnected)/i.test(s);
+      const cls = connected ? 'good' : connecting ? 'warn' : bad ? 'bad' : 'neutral';
+      const label = statusRaw || 'desconhecido';
+      return `<span class="pill ${cls}"><span class="dot"></span>${escapeHtml(label)}</span>`;
+    }
+
+    function setUazOut(obj) {
+      el('uazOut').textContent = typeof obj === 'string' ? obj : JSON.stringify(obj, null, 2);
+    }
+
+    async function refreshInstances() {
+      el('btnRefresh').disabled = true;
+      try {
+        const data = await api('/api/uaz/list', {});
+        const list = data.instances || [];
+        const wrap = el('instList');
+        wrap.innerHTML = '';
+        if (!list.length) {
+          wrap.innerHTML = `<div class="desc">Nenhuma instância salva ainda. Crie uma instância à esquerda.</div>`;
+          return;
+        }
+        list.forEach((i) => {
+          const card = document.createElement('div');
+          card.className = 'instCard';
+          card.innerHTML = `
+            <div class="instCard-main">
+              <div class="instTitle">${escapeHtml(i.displayName || i.name || i.id || 'instância')}</div>
+              <div class="instCard-meta">
+                ${statusPill(i.status)}
+                <span class="evo">${escapeHtml(i.name || '')}</span>
+              </div>
+            </div>
+            <div class="instCard-actions">
+              <button class="btn sm primary" data-act="select"><iconify-icon class="ico" icon="lucide:check" aria-hidden="true"></iconify-icon>Selecionar</button>
+              <button class="btn sm" data-act="qr"><iconify-icon class="ico" icon="lucide:qr-code" aria-hidden="true"></iconify-icon>QR</button>
+              <button class="btn sm" data-act="status"><iconify-icon class="ico" icon="lucide:activity" aria-hidden="true"></iconify-icon>Status</button>
+              <button class="btn sm danger" data-act="remove"><iconify-icon class="ico" icon="lucide:trash-2" aria-hidden="true"></iconify-icon>Remover</button>
+            </div>
+          `;
+          card.querySelectorAll('button').forEach((b) => {
+            b.onclick = async () => {
+              const act = b.dataset.act;
+              try {
+                if (act === 'select') {
+                  el('instToken').value = i.token || '';
+                  state.selectedInstance = i;
+                  toast('Selecionado', 'Token preenchido automaticamente.');
+                } else if (act === 'status') {
+                  const r = await api('/api/uaz/status', { token: i.token });
+                  setUazOut(r);
+                } else if (act === 'qr') {
+                  const r = await api('/api/uaz/connect-qr', { token: i.token });
+                  setUazOut(r);
+                  const raw = r.qrcode || r.qr || r.base64;
+                  if (raw) openQrModal(raw, i.name || i.id || 'instância');
+                  else toast('QR não disponível', 'A API não retornou imagem do QR.');
+                } else if (act === 'remove') {
+                  await api('/api/uaz/remove', { id: i.id, name: i.name, token: i.token });
+                  // Se estava selecionada, limpa
+                  if (state.selectedInstance?.id === i.id || state.selectedInstance?.token === i.token) {
+                    state.selectedInstance = null;
+                    el('instToken').value = '';
+                  }
+                  toast('Removido', 'Instância removida do painel (cache local).');
+                  await refreshInstances();
+                }
+              } catch (e) {
+                toast('Erro', e.message);
+                setUazOut(e.message);
+              }
+            };
+          });
+          wrap.appendChild(card);
+        });
+      } catch (e) {
+        toast('Erro', e.message);
+        setUazOut(e.message);
+      } finally {
+        el('btnRefresh').disabled = false;
+      }
+    }
+
+    el('btnRefresh').onclick = () => refreshInstances();
+    el('btnInstCreate').onclick = async () => {
+      const name = el('instName').value.trim();
+      if (!name) return toast('Falta nome', 'Digite um nome único para a instância.');
+      el('btnInstCreate').disabled = true;
+      try {
+        const r = await api('/api/uaz/create', { name });
+        setUazOut(r);
+        toast('Instância criada', 'Agora conecte via QR ou pareamento.');
+        await refreshInstances();
+        if (r.token) el('instToken').value = r.token;
+      } catch (e) {
+        toast('Erro', e.message);
+        setUazOut(e.message);
+      } finally {
+        el('btnInstCreate').disabled = false;
+      }
+    };
+
+    el('btnConnectQr').onclick = async () => {
+      const token = el('instToken').value.trim();
+      if (!token) return toast('Falta token', 'Selecione uma instância ou cole o token.');
+      try {
+        const r = await api('/api/uaz/connect-qr', { token });
+        setUazOut(r);
+        const raw = r.qrcode || r.qr || r.base64;
+        if (raw) openQrModal(raw, 'Conectar instância');
+        else toast('QR não disponível', 'A API não retornou imagem do QR.');
+      } catch (e) {
+        toast('Erro', e.message);
+        setUazOut(e.message);
+      }
+    };
+    el('btnStatus').onclick = async () => {
+      const token = el('instToken').value.trim();
+      if (!token) return toast('Falta token', 'Selecione uma instância ou cole o token.');
+      try {
+        const r = await api('/api/uaz/status', { token });
+        setUazOut(r);
+        toast('Status atualizado', 'Veja o painel de log.');
+        await refreshInstances();
+      } catch (e) {
+        toast('Erro', e.message);
+        setUazOut(e.message);
+      }
+    };
+    el('btnConnectPair').onclick = async () => {
+      const token = el('instToken').value.trim();
+      const phone = el('pairPhone').value.trim();
+      if (!token) return toast('Falta token', 'Selecione uma instância ou cole o token.');
+      if (!phone) return toast('Falta telefone', 'Informe o telefone para pareamento (ex.: 551799...).');
+      try {
+        const r = await api('/api/uaz/connect-pair', { token, phone });
+        setUazOut(r);
+        toast('Pareamento iniciado', 'Siga as instruções no WhatsApp.');
+      } catch (e) {
+        toast('Erro', e.message);
+        setUazOut(e.message);
+      }
+    };
+    el('btnWebhook').onclick = async () => {
+      const token = el('instToken').value.trim();
+      const environment = (el('whEnv')?.value || 'test');
+      const url = el('whUrl').value.trim();
+      if (!token) return toast('Falta token', 'Selecione uma instância ou cole o token.');
+      try {
+        const r = await api('/api/uaz/webhook', { token, environment: environment === 'custom' ? 'custom' : environment, url: environment === 'custom' ? url : '' });
+        setUazOut(r);
+        toast('Webhook ativado', `Ambiente: ${environment}. URL aplicada: ${r.webhookUrl || '—'}`);
+      } catch (e) {
+        toast('Erro', e.message);
+        setUazOut(e.message);
+      }
+    };
+    el('btnOpenLocalWebhook').onclick = () => {
+      const hint = location.origin + '/webhook/uaz/' + encodeURIComponent(state.selectedInstance?.id || 'minha-instancia');
+      el('whUrl').value = hint;
+      el('whEnv').value = 'custom';
+      toast('URL preenchida', 'Atenção: localhost só funciona em testes locais. Em produção precisa ser URL pública.');
+    };
+
+    // Webhook environments (for UX defaults)
+    async function refreshWebhookEnvs() {
+      try {
+        const res = await fetch('/api/config/webhooks');
+        const data = await res.json();
+        if (!res.ok) return;
+        const envs = data.environments || [];
+        const sel = el('whEnv');
+        if (!sel) return;
+        // keep custom option always
+        const customOpt = sel.querySelector('option[value="custom"]');
+        sel.innerHTML = '';
+        envs.forEach((e) => {
+          const o = document.createElement('option');
+          o.value = e.id;
+          o.textContent = e.label;
+          sel.appendChild(o);
+        });
+        if (customOpt) sel.appendChild(customOpt);
+        const saved = localStorage.getItem('wh_env');
+        if (saved && sel.querySelector(`option[value="${saved}"]`)) sel.value = saved;
+      } catch {}
+    }
+
+    if (el('whEnv')) {
+      const saved = localStorage.getItem('wh_env');
+      if (saved && el('whEnv').querySelector(`option[value="${saved}"]`)) el('whEnv').value = saved;
+      el('whEnv').onchange = () => localStorage.setItem('wh_env', el('whEnv').value);
+    }
+
+    // Supabase profiles admin
+    const sbState = { sort: 'created_at', order: 'desc', offset: 0, limit: 50, total: 0, rows: [] };
+
+    function renderProfiles() {
+      const wrap = el('sbTable');
+      const rows = sbState.rows || [];
+      if (!rows.length) {
+        wrap.innerHTML = `<div class="desc">Nenhum registro encontrado.</div>`;
+        return;
+      }
+      wrap.innerHTML = '';
+      rows.forEach((r) => {
+        const card = document.createElement('div');
+        card.className = 'instCard';
+        const left = document.createElement('div');
+        left.innerHTML = `
+          <div class="instTitle">${escapeHtml(r.clinic_name || r.name || r.id)}</div>
+          <div class="desc" style="margin:6px 0 0;">
+            <span class="pill neutral"><span class="dot"></span>${escapeHtml(r.evo || '—')}</span>
+            <span style="margin-left:8px;color:var(--muted);font-size:.82rem;">${escapeHtml(r.numero || '')}</span>
+          </div>
+          <div class="desc" style="margin:6px 0 0;">ID: <span style="font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, \"Liberation Mono\", \"Courier New\", monospace;">${escapeHtml(r.id)}</span></div>
+        `;
+        const actions = document.createElement('div');
+        actions.className = 'row';
+        actions.style.justifyContent = 'flex-end';
+        actions.style.gap = '8px';
+        actions.innerHTML = `<button class="btn">Editar</button>`;
+        actions.querySelector('button').onclick = () => selectProfileForEdit(r);
+        card.appendChild(left);
+        card.appendChild(actions);
+        wrap.appendChild(card);
+      });
+    }
+
+    function selectProfileForEdit(r) {
+      el('sbEditId').value = r.id || '';
+      el('sbEditName').value = r.name || '';
+      el('sbEditClinic').value = r.clinic_name || '';
+      el('sbEditEvo').value = r.evo || '';
+      el('sbEditNumero').value = r.numero || '';
+      el('sbEditAtiva').value = String(Boolean(r.ativa_geral));
+      toast('Perfil carregado', 'Edite os campos à direita e clique em Salvar.');
+    }
+
+    async function refreshProfiles() {
+      el('sbRefresh').disabled = true;
+      try {
+        const q = el('sbQuery').value.trim();
+        const sort = el('sbSort').value || sbState.sort;
+        const order = el('sbOrder').value || sbState.order;
+        const ativaRaw = el('sbAtiva').value;
+        const ativaOnly = ativaRaw === 'all' ? null : (ativaRaw === 'true');
+
+        const data = await api('/api/admin/profiles/list', { q, sort, order, limit: sbState.limit, offset: sbState.offset, ativaOnly });
+        sbState.rows = data.rows || [];
+        sbState.total = data.total || 0;
+        sbState.sort = sort;
+        sbState.order = order;
+
+        const cols = (data.columns || []).filter(Boolean);
+        const sortSel = el('sbSort');
+        if (!sortSel.options.length) {
+          cols.forEach((c) => {
+            const o = document.createElement('option');
+            o.value = c;
+            o.textContent = c;
+            sortSel.appendChild(o);
+          });
+          sortSel.value = sbState.sort;
+        }
+
+        el('sbInfo').textContent = `Mostrando ${sbState.offset + 1}-${Math.min(sbState.offset + sbState.limit, sbState.total)} de ${sbState.total}`;
+        renderProfiles();
+      } catch (e) {
+        toast('Erro', e.message);
+        el('sbTable').textContent = e.message;
+      } finally {
+        el('sbRefresh').disabled = false;
+      }
+    }
+
+    el('sbRefresh').onclick = () => refreshProfiles();
+    el('sbPrev').onclick = () => { sbState.offset = Math.max(0, sbState.offset - sbState.limit); refreshProfiles().catch(()=>{}); };
+    el('sbNext').onclick = () => { sbState.offset = sbState.offset + sbState.limit; refreshProfiles().catch(()=>{}); };
+    el('sbQuery').onkeydown = (e) => { if (e.key === 'Enter') refreshProfiles().catch(()=>{}); };
+    el('sbAtiva').onchange = () => { sbState.offset = 0; refreshProfiles().catch(()=>{}); };
+    el('sbSort').onchange = () => { sbState.offset = 0; refreshProfiles().catch(()=>{}); };
+    el('sbOrder').onchange = () => { sbState.offset = 0; refreshProfiles().catch(()=>{}); };
+
+    el('sbSave').onclick = async () => {
+      const id = el('sbEditId').value.trim();
+      if (!id) return toast('Selecione um perfil', 'Clique em “Editar” em algum registro.');
+      el('sbSave').disabled = true;
+      try {
+        const payload = {
+          name: el('sbEditName').value.trim(),
+          clinic_name: el('sbEditClinic').value.trim(),
+          evo: el('sbEditEvo').value.trim(),
+          numero: el('sbEditNumero').value.trim(),
+          ativa_geral: el('sbEditAtiva').value === 'true',
+        };
+        const r = await api('/api/admin/profiles/update', { id, data: payload });
+        toast('Salvo', 'Perfil atualizado com sucesso.');
+        // Update local row if present
+        const idx = sbState.rows.findIndex((x) => x.id === id);
+        if (idx >= 0) sbState.rows[idx] = { ...sbState.rows[idx], ...r.profile };
+        renderProfiles();
+      } catch (e) {
+        const msg = String(e.message || e);
+        toast('Erro', msg);
+        if (/não encontrado|deletad|404/i.test(msg)) {
+          // se o perfil sumiu fora do painel, limpa editor e atualiza a lista
+          el('sbEditId').value = '';
+          el('sbEditName').value = '';
+          el('sbEditClinic').value = '';
+          el('sbEditEvo').value = '';
+          el('sbEditNumero').value = '';
+          el('sbEditAtiva').value = 'true';
+          await refreshProfiles();
+        }
+      } finally {
+        el('sbSave').disabled = false;
+      }
+    };
+
+    // Auto-refresh profiles when tab is open
+    setInterval(() => {
+      const visible = !el('viewSupabase').classList.contains('hide');
+      if (visible) refreshProfiles().catch(()=>{});
+    }, 15000);
+
+    // Auth admin
+    const authState = { users: [], selectedId: null };
+
+    function renderAuthUsers() {
+      const wrap = el('authList');
+      const users = authState.users || [];
+      if (!users.length) {
+        wrap.innerHTML = `<div class="desc">Nenhum usuário encontrado.</div>`;
+        return;
+      }
+      wrap.innerHTML = '';
+      users.forEach((u) => {
+        const meta = u.user_metadata || {};
+        const title = meta.clinic_name || meta.name || u.email || u.id;
+        const pill = u.banned_until ? `<span class="pill bad"><span class="dot"></span>desativado</span>` : `<span class="pill good"><span class="dot"></span>ativo</span>`;
+        const card = document.createElement('div');
+        card.className = 'instCard';
+        card.innerHTML = `
+          <div>
+            <div class="instTitle">${escapeHtml(title)}</div>
+            <div class="desc" style="margin:6px 0 0;">${pill} <span style="margin-left:8px;color:var(--muted);font-size:.82rem;">${escapeHtml(u.email || '')}</span></div>
+            <div class="desc" style="margin:6px 0 0;">ID: <span style="font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, \"Liberation Mono\", \"Courier New\", monospace;">${escapeHtml(u.id)}</span></div>
+            <div class="desc" style="margin:6px 0 0;">profile_id: <span style="font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, \"Liberation Mono\", \"Courier New\", monospace;">${escapeHtml(meta.profile_id || '—')}</span></div>
+          </div>
+          <div class="row" style="justify-content:flex-end; gap:8px;">
+            <button class="btn" data-act="select">Selecionar</button>
+          </div>
+        `;
+        card.querySelector('button[data-act="select"]').onclick = () => {
+          authState.selectedId = u.id;
+          el('authSelId').value = u.id;
+          el('authLinkProfileId').value = meta.profile_id || '';
+          if (el('authEditEmail')) el('authEditEmail').value = u.email || '';
+          if (el('authEditName')) el('authEditName').value = meta.name || '';
+          if (el('authEditClinic')) el('authEditClinic').value = meta.clinic_name || '';
+          if (el('authEditPass')) el('authEditPass').value = '';
+          toast('Selecionado', 'Usuário selecionado para ações rápidas.');
+        };
+        wrap.appendChild(card);
+      });
+    }
+
+    async function refreshAuthUsers() {
+      el('authRefresh').disabled = true;
+      try {
+        const q = el('authQuery').value.trim();
+        const data = await api('/api/admin/auth/list', { page: 1, perPage: 500, q });
+        authState.users = data.users || [];
+        renderAuthUsers();
+      } catch (e) {
+        toast('Erro', e.message);
+        el('authList').textContent = e.message;
+      } finally {
+        el('authRefresh').disabled = false;
+      }
+    }
+
+    el('authRefresh').onclick = () => refreshAuthUsers();
+    el('authQuery').onkeydown = (e) => { if (e.key === 'Enter') refreshAuthUsers().catch(()=>{}); };
+
+    el('authCreate').onclick = async () => {
+      el('authCreate').disabled = true;
+      try {
+        const email = el('authNewEmail').value.trim();
+        const password = el('authNewPass').value.trim();
+        const name = el('authNewName').value.trim();
+        const clinic_name = el('authNewClinic').value.trim();
+        const clientePrimeiroNome = el('authNewFirst').value.trim();
+        const r = await api('/api/admin/auth/create', { email, password, name, clinic_name, clientePrimeiroNome, email_confirm: true });
+        toast('Usuário criado', `Vinculado ao profile_id: ${r.profile?.id || '—'}`);
+        await refreshAuthUsers();
+      } catch (e) {
+        toast('Erro', e.message);
+      } finally {
+        el('authCreate').disabled = false;
+      }
+    };
+
+    el('authDeactivate').onclick = async () => {
+      const id = el('authSelId').value.trim();
+      if (!id) return toast('Selecione um usuário', 'Clique em “Selecionar” em algum usuário.');
+      try {
+        await api('/api/admin/auth/deactivate', { id });
+        toast('Desativado', 'Usuário desativado com sucesso.');
+        await refreshAuthUsers();
+      } catch (e) {
+        toast('Erro', e.message);
+      }
+    };
+
+    el('authActivate').onclick = async () => {
+      const id = el('authSelId').value.trim();
+      if (!id) return toast('Selecione um usuário', 'Clique em “Selecionar” em algum usuário.');
+      try {
+        await api('/api/admin/auth/activate', { id });
+        toast('Ativado', 'Usuário ativado com sucesso.');
+        await refreshAuthUsers();
+      } catch (e) {
+        toast('Erro', e.message);
+      }
+    };
+
+    el('authLink').onclick = async () => {
+      const userId = el('authSelId').value.trim();
+      const profileId = el('authLinkProfileId').value.trim();
+      if (!userId) return toast('Selecione um usuário', 'Clique em “Selecionar” em algum usuário.');
+      if (!profileId) return toast('Falta profile_id', 'Informe o profile_id para vincular.');
+      try {
+        await api('/api/admin/auth/link', { userId, profileId });
+        toast('Vinculado', 'user_metadata.profile_id atualizado.');
+        await refreshAuthUsers();
+      } catch (e) {
+        toast('Erro', e.message);
+      }
+    };
+
+    el('authSave').onclick = async () => {
+      const id = el('authSelId').value.trim();
+      if (!id) return toast('Selecione um usuário', 'Clique em “Selecionar” em algum usuário.');
+      el('authSave').disabled = true;
+      try {
+        const email = el('authEditEmail').value.trim();
+        const password = el('authEditPass').value.trim();
+        if (password && password.length < 6) {
+          throw new Error('Senha deve ter pelo menos 6 caracteres');
+        }
+
+        const current = authState.users.find((x) => x.id === id) || {};
+        const meta = current.user_metadata || {};
+
+        const name = el('authEditName').value.trim();
+        const clinic_name = el('authEditClinic').value.trim();
+        const user_metadata = {
+          ...meta,
+          name: name || meta.name || null,
+          clinic_name: clinic_name || meta.clinic_name || null,
+          profile_id: meta.profile_id || null,
+        };
+
+        await api('/api/admin/auth/update', {
+          id,
+          email: email || current.email,
+          password: password || undefined,
+          user_metadata,
+        });
+
+        el('authEditPass').value = '';
+        toast('Salvo', 'Usuário atualizado (email/senha/metadata).');
+        await refreshAuthUsers();
+      } catch (e) {
+        toast('Erro', e.message);
+      } finally {
+        el('authSave').disabled = false;
+      }
+    };
+
+    // QR Modal actions
+    const qrBack = el('qrModalBack');
+    const qrImg = el('qrImg');
+    function openQrModal(raw, title) {
+      const dataUrl = raw.startsWith('data:') ? raw : `data:image/png;base64,${raw}`;
+      state.lastQrDataUrl = dataUrl;
+      state.lastQrFileName = `qr-${Date.now()}.png`;
+      el('qrTitle').textContent = title || 'QR Code';
+      qrImg.src = dataUrl;
+      qrBack.dataset.open = 'true';
+      toast('QR pronto', 'Escaneie com o WhatsApp do celular.');
+    }
+    function closeQrModal(){ qrBack.dataset.open = 'false'; }
+    el('btnQrClose').onclick = closeQrModal;
+    el('btnQrClose2').onclick = closeQrModal;
+    qrBack.addEventListener('click', (e) => { if (e.target === qrBack) closeQrModal(); });
+    window.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeQrModal(); });
+
+    async function dataUrlToBlob(dataUrl) {
+      const res = await fetch(dataUrl);
+      return await res.blob();
+    }
+
+    el('btnQrDownload').onclick = async () => {
+      if (!state.lastQrDataUrl) return;
+      const a = document.createElement('a');
+      a.href = state.lastQrDataUrl;
+      a.download = state.lastQrFileName;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      toast('Baixado', 'QR Code salvo como arquivo.');
+    };
+
+    el('btnQrCopy').onclick = async () => {
+      try {
+        const blob = await dataUrlToBlob(state.lastQrDataUrl);
+        await navigator.clipboard.write([new ClipboardItem({ [blob.type]: blob })]);
+        toast('Copiado', 'Imagem do QR Code copiada. Agora é só colar.');
+      } catch (e) {
+        toast('Não foi possível copiar', 'Seu navegador bloqueou a cópia. Use “Baixar”.');
+      }
+    };
+
+    el('btnQrShare').onclick = async () => {
+      try {
+        if (!navigator.share) throw new Error('share_not_supported');
+        const blob = await dataUrlToBlob(state.lastQrDataUrl);
+        const file = new File([blob], state.lastQrFileName, { type: blob.type });
+        await navigator.share({ title: 'QR Code', text: 'QR Code para conectar a instância', files: [file] });
+        toast('Compartilhado', 'QR enviado pelo compartilhamento do sistema.');
+      } catch (e) {
+        toast('Compartilhar indisponível', 'Use “Copiar imagem” ou “Baixar”.');
+      }
+    };
+
+    el('btnQrWhatsapp').onclick = () => {
+      // WhatsApp não aceita enviar imagem via URL data; abrimos o WhatsApp Web com um texto guia.
+      const txt = encodeURIComponent('QR Code pronto. Cole a imagem (copiada) ou envie o arquivo baixado.');
+      window.open('https://web.whatsapp.com/send?text=' + txt, '_blank');
+    };
+
+    el('btnHelp').onclick = () => {
+      toast('Como usar', 'Agendamentos: cole o questionário → responda → criar. WhatsApp: crie instância → QR → webhook.');
+    };
+
+    // Initial
+    setTab('intake');
+    const chipText = el('chipServer')?.querySelector('span:last-child');
+    if (chipText) chipText.textContent = `Servidor: ${location.origin}`;
+    else el('chipServer').textContent = `Servidor: ${location.origin}`;
+  </script>
+</body>
+</html>
+

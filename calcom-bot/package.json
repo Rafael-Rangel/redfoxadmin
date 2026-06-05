@@ -1,0 +1,20 @@
+{
+  "name": "calcom-bot",
+  "version": "1.0.0",
+  "description": "Robô para criar contas Cal.com free com tempmail",
+  "type": "module",
+  "scripts": {
+    "setup": "node scripts/setup-table.mjs",
+    "create": "node src/create-account.mjs",
+    "list": "node src/list-accounts.mjs",
+    "intake": "node src/intake-server.mjs",
+    "intake:cli": "node scripts/intake-cli.mjs",
+    "test:intake": "node scripts/test-intake-leonardo.mjs"
+  },
+  "dependencies": {
+    "pg": "^8.13.3"
+  },
+  "devDependencies": {
+    "playwright": "^1.50.1"
+  }
+}

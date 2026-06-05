@@ -1,0 +1,13 @@
+.env
+.env.local
+.env.*.local
+
+calcom-bot/node_modules/
+calcom-bot/.intake/
+calcom-bot/.uaz/
+calcom-bot/.tools/
+calcom-bot/playwright-report/
+calcom-bot/test-results/
+calcom-bot/scripts/*.png
+
+.vercel

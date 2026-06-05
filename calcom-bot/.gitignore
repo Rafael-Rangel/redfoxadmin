@@ -1,0 +1,8 @@
+node_modules/
+.intake/
+.uaz/
+.tools/
+playwright-report/
+test-results/
+scripts/*.png
+.env
