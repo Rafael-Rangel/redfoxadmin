@@ -1,4 +1,4 @@
-# Publicar no GitHub (rafael-rangel/rafael) e Vercel
+# Publicar no GitHub (Rafael-Rangel/redfoxadmin) e Vercel
 # Rode no PowerShell a partir da pasta rafael/
 
 $ErrorActionPreference = "Stop"
@@ -15,16 +15,16 @@ if ($LASTEXITCODE -ne 0) {
 }
 
 Write-Host "`n=== 2. Criar repo (se ainda nao existir) ===" -ForegroundColor Cyan
-& $gh repo view rafael-rangel/rafael 2>$null
+& $gh repo view Rafael-Rangel/redfoxadmin 2>$null
 if ($LASTEXITCODE -ne 0) {
-  & $gh repo create rafael-rangel/rafael --public --source=. --remote=origin --push
+  & $gh repo create Rafael-Rangel/redfoxadmin --public --source=. --remote=origin --push
 } else {
   & $git push -u origin main
 }
 
 Write-Host "`n=== 3. Vercel ===" -ForegroundColor Cyan
 Write-Host "Importe em https://vercel.com/new"
-Write-Host "  Repo: rafael-rangel/rafael"
+Write-Host "  Repo: Rafael-Rangel/redfoxadmin"
 Write-Host "  Root Directory: calcom-bot"
 Write-Host "  Env vars: copie de .env.example (valores do seu .env local)"
 Write-Host ""
